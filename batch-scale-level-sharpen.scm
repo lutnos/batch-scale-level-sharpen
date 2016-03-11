@@ -2,15 +2,18 @@
 ; has a users defined suffix
 ; "Scaled" , "Leveled " and "Sharpened"
 ; Written in June 2011
+; Modified Sep 2015 for explicit UFRaw
 
-(define (script-fu-batch-sls globexp suffix ratio bsharpen bautolevel bsharpum1 bsharpum2 bsharpum3)
+(define (script-fu-batch-sls globexp bufraw suffix ratio bsharpen bautolevel bsharpum1 bsharpum2 bsharpum3)
 
 (let* ((filelist (cadr (file-glob globexp 1))))
 
 (while (not (null? filelist))
      (let* ((fname (car filelist))
         
-     (img (car (gimp-file-load RUN-NONINTERACTIVE fname fname))))
+     (img (car (cond
+                      ((= bufraw TRUE) (file-ufraw-load RUN-NONINTERACTIVE fname fname))
+                      (else(gimp-file-load RUN-NONINTERACTIVE fname fname))))))
      (let* (
            (xdrawable   (car (gimp-image-active-drawable img)))
            (cur-width  (car (gimp-image-width img)))
@@ -38,7 +41,7 @@
 		
        ;(gimp-message "Nu har vi sparat!")
 	   
-       ;(gimp-display-delete img) Lite synd att vi inte kan köra denna ... Måste testa på bibliotek med mycket filer så det inte blir overflow
+       ;(gimp-display-delete img) Lite synd att vi inte kan kï¿½ra denna ... Mï¿½ste testa pï¿½ bibliotek med mycket filer sï¿½ det inte blir overflow
      )
     (set! filelist (cdr filelist)))))
 )
@@ -49,10 +52,11 @@
 		    _"_Batch Scale/Level/Sharpen ..."
 		    "Scale/Levele and Sharpen many Pictures, Save them in new files"
 		    "Sven Tryding"
-		    "2011, Sven Tryding"
-		    "June, 2011"
+		    "2011, Sven Tryding, modified 2015 Dave English"
+		    "June, 2011, Sep 2015"
 		    ""
 		    SF-STRING "Path" "C:\\Users\\Public\\Pictures\\*.jpg"
+		    SF-TOGGLE "Ufraw" FALSE
               SF-STRING "Suffix" "_small.jpg"
 
               SF-VALUE "Scaling ratio (min 0.01, max 5)" "0.30"
